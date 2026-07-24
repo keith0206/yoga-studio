@@ -1,8 +1,11 @@
 #!/usr/bin/env python
-"""Bind IPv4 + IPv6 (V6ONLY) then exec gunicorn on those FDs.
+"""Bind dual-stack then exec gunicorn on that FD.
 
-Fly proxy probes 0.0.0.0:8000; service health checks use the IPv6 6PN address.
-Gunicorn cannot --bind both without Address-already-in-use on dual-stack kernels.
+Fly Proxy reaches the VM over private IPv4 (needs 0.0.0.0 / IPv4-mapped).
+Service health checks use 6PN IPv6 (needs [::]).
+
+Gunicorn's native --bind [::]:PORT often sets IPV6_V6ONLY=1 on Linux, so
+IPv4 proxy probes fail. Pre-bind one AF_INET6 socket with V6ONLY=0 instead.
 """
 from __future__ import annotations
 
@@ -12,22 +15,14 @@ import socket
 PORT = int(os.environ.get("PORT", "8000"))
 
 
-def listen(family: int, address: tuple, *, v6only: bool | None = None) -> socket.socket:
-    sock = socket.socket(family, socket.SOCK_STREAM)
+def main() -> None:
+    sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    if v6only is not None:
-        sock.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 1 if v6only else 0)
-    sock.bind(address)
+    sock.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
+    sock.bind(("::", PORT))
     sock.listen(2048)
     os.set_inheritable(sock.fileno(), True)
-    return sock
 
-
-def main() -> None:
-    sockets = [
-        listen(socket.AF_INET, ("0.0.0.0", PORT)),
-        listen(socket.AF_INET6, ("::", PORT), v6only=True),
-    ]
     args = [
         "gunicorn",
         "--workers",
@@ -36,10 +31,10 @@ def main() -> None:
         "2",
         "--timeout",
         "60",
+        "--bind",
+        f"fd://{sock.fileno()}",
+        "config.wsgi:application",
     ]
-    for sock in sockets:
-        args.extend(["--bind", f"fd://{sock.fileno()}"])
-    args.append("config.wsgi:application")
     os.execvp(args[0], args)
 
 
