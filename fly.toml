@@ -1,0 +1,36 @@
+app = "soulful"
+primary_region = "sin"
+
+[build]
+
+[env]
+  DEBUG = "false"
+  PORT = "8000"
+  # Volume-backed SQLite (created via `fly volumes create`); not Fly Postgres.
+  DATABASE_URL = "sqlite:////data/db.sqlite3"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [[http_service.checks]]
+    interval = "15s"
+    timeout = "5s"
+    grace_period = "45s"
+    method = "GET"
+    path = "/health/"
+
+[[vm]]
+  memory = "256mb"
+  cpu_kind = "shared"
+  cpus = 1
+
+# Persistent SQLite data — create with:
+#   fly volumes create yoga_studio_data --region sin --size 1 -a soulful
+[[mounts]]
+  source = "yoga_studio_data"
+  destination = "/data"

@@ -1,0 +1,16 @@
+.venv
+__pycache__
+*.py[cod]
+# Never bake local DB into the image — production SQLite lives on the Fly volume.
+*.sqlite3
+db.sqlite3
+.env
+staticfiles
+.git
+.gitignore
+*.log
+.DS_Store
+*.md
+.cursor
+design-demo
+media

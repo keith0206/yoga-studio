@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}Teachers — Studio Hours{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="page-head">
+    <h1>Teachers</h1>
+    <button class="btn btn-primary" type="button" id="openAddTeacher">Add teacher</button>
+  </div>
+  <form class="filters" method="get">
+    <div>
+      <label>Month</label>
+      <select name="month" onchange="this.form.submit()">
+        {% for value, label in month_choices %}
+          <option value="{{ value }}" {% if value == month_value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+  <div class="teacher-cards">
+    {% for row in rows %}
+    <div class="teacher-card">
+      <h3>{{ row.teacher.name }}</h3>
+      <p class="teacher-login muted">
+        {% if row.teacher.user %}
+          Login: <strong>{{ row.teacher.user.username }}</strong>
+        {% else %}
+          No login linked
+        {% endif %}
+      </p>
+      <div class="mini-stats">
+        <div><div class="n">{{ row.scheduled }}</div><div class="l">Classes scheduled</div></div>
+        <div><div class="n">{{ row.confirmed }}</div><div class="l">Confirmed</div></div>
+        <div><div class="n">{{ row.student_visits }}</div><div class="l">Student visits</div></div>
+        <div><div class="n">{{ row.as_substitute }}</div><div class="l">As substitute</div></div>
+      </div>
+      <div class="teacher-actions">
+        <button class="btn btn-ghost btn-sm" type="button"
+                data-edit-login
+                data-teacher-id="{{ row.teacher.id }}"
+                data-teacher-name="{{ row.teacher.name }}"
+                data-username="{% if row.teacher.user %}{{ row.teacher.user.username }}{% endif %}">
+          Edit login
+        </button>
+        <form method="post" action="{% url 'teacher_remove' row.teacher.id %}" class="inline"
+              onsubmit="return confirm('Remove {{ row.teacher.name }}? If they have classes, they will be deactivated instead of deleted.');">
+          {% csrf_token %}
+          <input type="hidden" name="month" value="{{ month_value }}" />
+          <button class="btn btn-ghost btn-sm btn-danger" type="submit">Remove</button>
+        </form>
+      </div>
+    </div>
+    {% empty %}
+    <p class="muted">No teachers yet. Use Add teacher or run seed_demo_data.</p>
+    {% endfor %}
+  </div>
+  <div class="panel">
+    <table>
+      <thead>
+        <tr>
+          <th>Teacher</th>
+          <th>Username</th>
+          <th>Scheduled</th>
+          <th>Confirmed</th>
+          <th>Student visits</th>
+          <th>As substitute</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td>{{ row.teacher.name }}</td>
+          <td>{% if row.teacher.user %}{{ row.teacher.user.username }}{% else %}—{% endif %}</td>
+          <td>{{ row.scheduled }}</td>
+          <td>{{ row.confirmed }}</td>
+          <td>{{ row.student_visits }}</td>
+          <td>{{ row.as_substitute }}</td>
+          <td class="table-actions">
+            <button class="btn btn-ghost btn-sm" type="button"
+                    data-edit-login
+                    data-teacher-id="{{ row.teacher.id }}"
+                    data-teacher-name="{{ row.teacher.name }}"
+                    data-username="{% if row.teacher.user %}{{ row.teacher.user.username }}{% endif %}">
+              Edit login
+            </button>
+            <form method="post" action="{% url 'teacher_remove' row.teacher.id %}" class="inline"
+                  onsubmit="return confirm('Remove {{ row.teacher.name }}? If they have classes, they will be deactivated instead of deleted.');">
+              {% csrf_token %}
+              <input type="hidden" name="month" value="{{ month_value }}" />
+              <button class="btn btn-ghost btn-sm btn-danger" type="submit">Remove</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="drawer-backdrop" id="teacherDrawerBackdrop"></div>
+<aside class="drawer" id="addTeacherDrawer" aria-label="Add teacher" hidden>
+  <h2>Add teacher</h2>
+  <p class="hint">Creates a teacher profile and login.</p>
+  <form method="post" action="{% url 'teacher_add' %}">
+    {% csrf_token %}
+    <input type="hidden" name="month" value="{{ month_value }}" />
+    <div class="row">
+      <label for="id_add_name">Name</label>
+      <input type="text" name="name" id="id_add_name" required maxlength="120" style="width:100%" />
+    </div>
+    <div class="row">
+      <label for="id_add_username">Username</label>
+      <input type="text" name="username" id="id_add_username" required maxlength="150" autocomplete="off" style="width:100%" />
+    </div>
+    <div class="row">
+      <label for="id_add_password">Password</label>
+      <input type="password" name="password" id="id_add_password" required minlength="6" autocomplete="new-password" style="width:100%" />
+    </div>
+    <div class="row">
+      <label for="id_add_email">Email (optional)</label>
+      <input type="email" name="email" id="id_add_email" style="width:100%" />
+    </div>
+    <div class="drawer-actions">
+      <div class="row-btns">
+        <button class="btn btn-ghost" type="button" data-close-teacher-drawer>Cancel</button>
+        <button class="btn btn-primary" type="submit">Add teacher</button>
+      </div>
+    </div>
+  </form>
+</aside>
+
+<aside class="drawer" id="editLoginDrawer" aria-label="Edit teacher login" hidden>
+  <h2>Edit login</h2>
+  <p class="hint" id="editLoginHint">Update username or password.</p>
+  <form method="post" id="editLoginForm" action="">
+    {% csrf_token %}
+    <input type="hidden" name="month" value="{{ month_value }}" />
+    <div class="row">
+      <label for="id_edit_username">Username</label>
+      <input type="text" name="username" id="id_edit_username" required maxlength="150" autocomplete="off" style="width:100%" />
+    </div>
+    <div class="row">
+      <label for="id_edit_password">New password</label>
+      <input type="password" name="password" id="id_edit_password" minlength="6" autocomplete="new-password" style="width:100%" placeholder="Leave blank to keep" />
+    </div>
+    <div class="drawer-actions">
+      <div class="row-btns">
+        <button class="btn btn-ghost" type="button" data-close-teacher-drawer>Cancel</button>
+        <button class="btn btn-primary" type="submit">Save login</button>
+      </div>
+    </div>
+  </form>
+</aside>
+
+<script>
+(function () {
+  const backdrop = document.getElementById("teacherDrawerBackdrop");
+  const addDrawer = document.getElementById("addTeacherDrawer");
+  const editDrawer = document.getElementById("editLoginDrawer");
+  const editForm = document.getElementById("editLoginForm");
+  const editUsername = document.getElementById("id_edit_username");
+  const editPassword = document.getElementById("id_edit_password");
+  const editHint = document.getElementById("editLoginHint");
+
+  function closeDrawers() {
+    addDrawer.classList.remove("open");
+    editDrawer.classList.remove("open");
+    addDrawer.hidden = true;
+    editDrawer.hidden = true;
+    backdrop.classList.remove("open");
+  }
+
+  function openDrawer(drawer) {
+    addDrawer.classList.remove("open");
+    editDrawer.classList.remove("open");
+    addDrawer.hidden = true;
+    editDrawer.hidden = true;
+    drawer.hidden = false;
+    drawer.classList.add("open");
+    backdrop.classList.add("open");
+  }
+
+  document.getElementById("openAddTeacher").addEventListener("click", function () {
+    openDrawer(addDrawer);
+  });
+
+  document.querySelectorAll("[data-edit-login]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      const id = btn.getAttribute("data-teacher-id");
+      const name = btn.getAttribute("data-teacher-name") || "teacher";
+      const username = btn.getAttribute("data-username") || "";
+      editForm.action = "/teachers/" + id + "/edit-login/";
+      editUsername.value = username;
+      editPassword.value = "";
+      editHint.textContent = "Update login for " + name + ".";
+      openDrawer(editDrawer);
+    });
+  });
+
+  document.querySelectorAll("[data-close-teacher-drawer]").forEach(function (btn) {
+    btn.addEventListener("click", closeDrawers);
+  });
+  backdrop.addEventListener("click", closeDrawers);
+})();
+</script>
+{% endblock %}

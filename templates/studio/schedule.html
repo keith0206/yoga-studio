@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}Schedule — Studio Hours{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="page-head">
+    <h1>Schedule</h1>
+    <div class="week-nav">
+      <a class="btn btn-ghost" href="?week={{ prev_week|date:'Y-m-d' }}">← Prev</a>
+      <strong>{{ week_start|date:"M j" }} – {{ week_end|date:"M j" }}</strong>
+      <a class="btn btn-ghost" href="?week={{ next_week|date:'Y-m-d' }}">Next →</a>
+      {% if can_edit %}
+      <button class="btn btn-primary" type="button" id="openAddClass">Add class</button>
+      {% endif %}
+    </div>
+  </div>
+  {% if can_edit %}
+  <p class="muted tip">Tip: click an empty cell to add a class — studio &amp; date fill in for you.</p>
+  {% endif %}
+
+  <div class="cal">
+    <div></div>
+    {% for day in days %}
+      <div class="cal-head">{{ day|date:"D j" }}</div>
+    {% endfor %}
+    {% for row in grid %}
+      <div class="cal-studio">{{ row.studio.name }}</div>
+      {% for cell in row.cells %}
+        <div class="cell" data-studio-id="{{ row.studio.id }}" data-date="{{ cell.date|date:'Y-m-d' }}">
+          <div class="band">
+            <div class="band-label">Morning</div>
+            {% for s in cell.morning %}
+              <div class="block {{ s.class_type.color_key }} {% if s.substitute_teacher %}has-sub{% endif %}">
+                <div class="block-time">{{ s.start_at|date:"H:i" }}</div>
+                <div class="block-name">{{ s.class_type.name }} ({{ s.students_display }})</div>
+                <div class="block-teacher">{{ s.original_teacher.name }}</div>
+                {% if s.substitute_teacher %}
+                <div class="block-sub">({{ s.substitute_teacher.name }})</div>
+                {% endif %}
+              </div>
+            {% empty %}
+              <div class="band-empty">—</div>
+            {% endfor %}
+          </div>
+          <div class="band band-pm">
+            <div class="band-label">Afternoon</div>
+            {% for s in cell.afternoon %}
+              <div class="block {{ s.class_type.color_key }} {% if s.substitute_teacher %}has-sub{% endif %}">
+                <div class="block-time">{{ s.start_at|date:"H:i" }}</div>
+                <div class="block-name">{{ s.class_type.name }} ({{ s.students_display }})</div>
+                <div class="block-teacher">{{ s.original_teacher.name }}</div>
+                {% if s.substitute_teacher %}
+                <div class="block-sub">({{ s.substitute_teacher.name }})</div>
+                {% endif %}
+              </div>
+            {% empty %}
+              <div class="band-empty">—</div>
+            {% endfor %}
+          </div>
+          {% if can_edit and cell.is_empty %}<span class="add-hint">+ Add</span>{% endif %}
+        </div>
+      {% endfor %}
+    {% endfor %}
+  </div>
+</div>
+
+{% if can_edit %}
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="drawer" id="addDrawer" aria-label="Add class">
+  <h2>Quick add class</h2>
+  <p class="hint">Few taps — stays on your schedule.</p>
+  <form method="post" action="{% url 'add_class' %}" id="addForm">
+    {% csrf_token %}
+    <input type="hidden" name="week" value="{{ week_start|date:'Y-m-d' }}" />
+    <input type="hidden" name="time" id="id_time" value="09:00" />
+    <input type="hidden" name="class_type" id="id_class_type" value="{% if class_types %}{{ class_types.0.id }}{% endif %}" />
+
+    <div class="row">
+      <label for="id_studio">Studio</label>
+      <select name="studio" id="id_studio" required>
+        {% for s in studios %}
+          <option value="{{ s.id }}">{{ s.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="row">
+      <label for="id_date">Date</label>
+      <input type="date" name="date" id="id_date" value="{{ week_start|date:'Y-m-d' }}" required />
+    </div>
+    <div class="row">
+      <label>Time</label>
+      <div class="chips" id="timeChips">
+        {% for t in time_presets %}
+          <button type="button" class="chip time {% if t == '09:00' %}on{% endif %}" data-time="{{ t }}">{{ t }}</button>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="row">
+      <label>Class type</label>
+      <div class="chips" id="typeChips">
+        {% for ct in class_types %}
+          <button type="button" class="chip {% if forloop.first %}on{% endif %}"
+                  data-type-id="{{ ct.id }}"
+                  data-expected="{{ ct.default_expected_students }}">{{ ct.name }}</button>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="row">
+      <label for="id_teacher">Teacher</label>
+      <select name="teacher" id="id_teacher" required>
+        {% for t in teachers %}
+          <option value="{{ t.id }}">{{ t.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="row">
+      <label for="id_expected_students">Expected students</label>
+      <input type="number" name="expected_students" id="id_expected_students" min="0"
+             value="{% if class_types %}{{ class_types.0.default_expected_students }}{% else %}12{% endif %}"
+             style="width:100px;min-width:100px" />
+    </div>
+    <label class="check-row">
+      <input type="checkbox" name="repeat_weeks" value="true" />
+      Repeat same slot for next 4 weeks
+    </label>
+    <div class="drawer-actions">
+      <div class="row-btns">
+        <button class="btn btn-ghost" type="button" id="closeDrawer">Cancel</button>
+        <button class="btn btn-primary" type="submit" name="action" value="save">Save</button>
+      </div>
+      <button class="btn btn-olive" type="submit" name="action" value="another" id="saveAnother">Save &amp; add another</button>
+    </div>
+  </form>
+</aside>
+<script>
+(function () {
+  const drawer = document.getElementById("addDrawer");
+  const backdrop = document.getElementById("drawerBackdrop");
+  const studio = document.getElementById("id_studio");
+  const dateInput = document.getElementById("id_date");
+  const timeInput = document.getElementById("id_time");
+  const typeInput = document.getElementById("id_class_type");
+  const expected = document.getElementById("id_expected_students");
+
+  function openDrawer(studioId, date) {
+    if (studioId) studio.value = studioId;
+    if (date) dateInput.value = date;
+    drawer.classList.add("open");
+    backdrop.classList.add("open");
+  }
+  function closeDrawer() {
+    drawer.classList.remove("open");
+    backdrop.classList.remove("open");
+  }
+  document.getElementById("openAddClass").addEventListener("click", () => openDrawer());
+  document.getElementById("closeDrawer").addEventListener("click", closeDrawer);
+  backdrop.addEventListener("click", closeDrawer);
+
+  document.querySelectorAll(".cell").forEach((cell) => {
+    cell.addEventListener("click", (e) => {
+      if (e.target.closest(".block")) return;
+      openDrawer(cell.dataset.studioId, cell.dataset.date);
+    });
+  });
+
+  document.querySelectorAll("#timeChips .chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll("#timeChips .chip").forEach((c) => c.classList.remove("on"));
+      chip.classList.add("on");
+      timeInput.value = chip.dataset.time;
+    });
+  });
+  document.querySelectorAll("#typeChips .chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll("#typeChips .chip").forEach((c) => c.classList.remove("on"));
+      chip.classList.add("on");
+      typeInput.value = chip.dataset.typeId;
+      expected.value = chip.dataset.expected;
+    });
+  });
+})();
+</script>
+{% endif %}
+{% endblock %}

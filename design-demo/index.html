@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Studio Hours — Earth tone demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --sand: #E8DFD0; --clay: #C4A484; --terracotta: #B56B4A; --umber: #5C4033;
+      --olive: #6B7054; --ochre: #C4933A; --stone: #F3EDE3; --cream: #FAF6F0;
+      --ink: #2C241C; --muted: #7A6E60; --line: #D9CFC0;
+      --vinyasa: #B56B4A; --yin: #8B7355; --beginner: #6B7054; --restore: #C4933A;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Outfit", sans-serif; background: var(--stone); color: var(--ink); min-height: 100vh; }
+    h1, .brand { font-family: "Fraunces", serif; font-weight: 600; }
+
+    .demo-bar {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center;
+      padding: 0.75rem 1.25rem; background: var(--umber); color: var(--cream);
+    }
+    .demo-bar span { opacity: 0.75; font-size: 0.8rem; margin-right: 0.4rem; }
+    .demo-bar button {
+      border: 1px solid rgba(250,246,240,0.25); background: transparent; color: var(--cream);
+      padding: 0.35rem 0.75rem; border-radius: 999px; font: inherit; font-size: 0.8rem; cursor: pointer;
+    }
+    .demo-bar button.active { background: var(--terracotta); border-color: var(--terracotta); }
+    .note {
+      padding: 0.65rem 1.25rem; font-size: 0.82rem; color: var(--muted);
+      background: var(--sand); border-bottom: 1px solid var(--line);
+    }
+    .screen { display: none; min-height: calc(100vh - 90px); }
+    .screen.active { display: block; }
+
+    .app-nav {
+      display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap;
+      padding: 1rem 1.75rem; background: var(--cream); border-bottom: 1px solid var(--line);
+    }
+    .brand { font-size: 1.3rem; color: var(--umber); margin-right: auto; }
+    .app-nav a { color: var(--muted); text-decoration: none; font-size: 0.92rem; font-weight: 500; }
+    .app-nav a.on { color: var(--terracotta); border-bottom: 2px solid var(--terracotta); padding-bottom: 2px; }
+    .app-nav .user { color: var(--muted); font-size: 0.82rem; }
+    .role-tag {
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+      color: var(--olive); border: 1px solid var(--olive); padding: 0.15rem 0.45rem; border-radius: 999px;
+    }
+
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 1.5rem 1.75rem; }
+    .page-head {
+      display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+      justify-content: space-between; margin-bottom: 1.25rem;
+    }
+    .page-head h1 { font-size: 1.7rem; color: var(--umber); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      border: none; border-radius: 8px; padding: 0.55rem 1rem;
+      font: inherit; font-weight: 500; cursor: pointer;
+    }
+    .btn-primary { background: var(--terracotta); color: white; }
+    .btn-ghost { background: transparent; color: var(--umber); border: 1px solid var(--line); }
+    .btn-olive { background: var(--olive); color: white; }
+    .btn-sm { padding: 0.4rem 0.85rem; font-size: 0.85rem; }
+    .btn:disabled { opacity: 0.45; cursor: default; }
+
+    .filters {
+      display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: end;
+      margin-bottom: 1.25rem; padding: 1rem;
+      background: var(--cream); border: 1px solid var(--line); border-radius: 12px;
+    }
+    label { font-size: 0.72rem; color: var(--muted); display: block; margin-bottom: 0.25rem; }
+    input, select {
+      font: inherit; padding: 0.5rem 0.7rem; border: 1px solid var(--line);
+      border-radius: 8px; background: white; color: var(--ink); min-width: 150px;
+    }
+
+    .stats {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.9rem; margin-bottom: 1.4rem;
+    }
+    @media (max-width: 800px) { .stats { grid-template-columns: 1fr 1fr; } }
+    .stat {
+      border-radius: 12px; padding: 1.05rem 1.15rem;
+      border: 1px solid var(--line); border-left: 4px solid var(--clay);
+    }
+    .stat.s1 { border-left-color: var(--terracotta); background: #F6E8E2; }
+    .stat.s2 { border-left-color: var(--olive); background: #EEF0E6; }
+    .stat.s3 { border-left-color: var(--ochre); background: #F7F0E0; }
+    .stat.s4 { border-left-color: var(--clay); background: #F5EDE3; }
+    .stat .n { font-family: "Fraunces", serif; font-size: 2rem; color: var(--umber); line-height: 1.1; }
+    .stat .l { font-size: 0.82rem; color: var(--muted); margin-top: 0.2rem; }
+
+    .panel { background: var(--cream); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th {
+      text-align: left; padding: 0.8rem 1rem; background: var(--sand);
+      color: var(--umber); font-weight: 600; font-size: 0.75rem;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    td { padding: 0.8rem 1rem; border-top: 1px solid var(--line); vertical-align: middle; }
+    .sub { color: var(--terracotta); font-size: 0.82rem; }
+    .muted { color: var(--muted); }
+    .ok { color: var(--olive); font-weight: 600; font-size: 0.85rem; }
+
+    .week-nav { display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap; }
+    .week-nav strong { color: var(--umber); }
+    .cal {
+      display: grid; grid-template-columns: 92px repeat(7, 1fr); gap: 6px; margin-top: 0.4rem;
+    }
+    .cal-head, .cal-studio {
+      font-size: 0.72rem; font-weight: 600; color: var(--muted); padding: 0.45rem; text-align: center;
+    }
+    .cal-studio {
+      text-align: left; color: var(--umber); background: var(--sand); border-radius: 8px;
+      display: flex; align-items: center; padding-left: 0.65rem;
+    }
+    .cell {
+      position: relative;
+      min-height: 160px; background: white; border: 1px solid var(--line);
+      border-radius: 10px; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.55rem;
+    }
+    .band {
+      display: flex; flex-direction: column; gap: 0.4rem; flex: 1;
+      min-height: 3.6rem; padding: 0.15rem 0.1rem;
+    }
+    .band-pm {
+      border-top: 1px dashed var(--line);
+      margin-top: 0.15rem;
+      padding-top: 0.55rem;
+    }
+    .band-label {
+      font-size: 0.58rem; font-weight: 600; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--muted); line-height: 1;
+      margin-bottom: 0.1rem;
+    }
+    .band-empty {
+      color: var(--line); font-size: 0.7rem; line-height: 1; padding: 0.2rem 0;
+    }
+    .block {
+      border-radius: 8px; padding: 0.4rem 0.45rem; color: white;
+      font-size: 0.65rem; line-height: 1.35;
+      margin: 0;
+    }
+    .block-time {
+      display: block; font-size: 0.72rem; font-weight: 700; line-height: 1.2;
+    }
+    .block-name {
+      display: block; font-weight: 600; line-height: 1.25; margin-top: 0.08rem;
+    }
+    .block-teacher {
+      display: block; margin-top: 0.12rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .block-sub {
+      display: block; margin-top: 0.08rem; opacity: 0.92; font-style: italic;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .block.vinyasa { background: var(--vinyasa); }
+    .block.yin { background: var(--yin); }
+    .block.beginner { background: var(--beginner); }
+    .block.restore { background: var(--restore); }
+    .block.has-sub { box-shadow: inset 0 0 0 2px rgba(255,255,255,0.45); }
+
+    .att-toolbar {
+      display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: space-between;
+      align-items: center; margin-bottom: 1rem;
+    }
+    .att-list { display: flex; flex-direction: column; gap: 0.85rem; }
+    .att-row {
+      display: grid; grid-template-columns: 1.3fr auto; gap: 1rem; align-items: center;
+      padding: 1.05rem 1.15rem; border-radius: 12px;
+      border: 1px solid var(--line); background: var(--cream);
+    }
+    @media (max-width: 720px) { .att-row { grid-template-columns: 1fr; } }
+    .att-meta { color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem; }
+    .att-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+    .att-actions input[type="number"] { width: 72px; min-width: 72px; }
+
+    .toast {
+      display: none; margin-top: 0.75rem; padding: 0.75rem 1rem;
+      background: #EEF0E6; border: 1px solid #C5CDB0; border-radius: 8px; color: var(--umber);
+      font-size: 0.9rem;
+    }
+    .toast.show { display: block; }
+    .toast.warn { background: #F7F0E0; border-color: #E4D4A8; }
+
+    #login.screen {
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(181,107,74,0.35), transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(107,112,84,0.4), transparent 45%),
+        radial-gradient(ellipse at 50% 100%, rgba(196,147,58,0.25), transparent 40%),
+        var(--sand);
+    }
+    #login.screen.active {
+      display: flex; align-items: center; justify-content: center; padding: 2rem;
+    }
+    .login-card {
+      width: min(400px, 100%); background: var(--cream);
+      border-radius: 16px; padding: 2.1rem 1.9rem; border: 1px solid var(--line);
+    }
+    .login-card .brand { font-size: 2rem; display: block; margin-bottom: 0.3rem; }
+    .login-card p { color: var(--muted); margin-bottom: 1.2rem; }
+    .field { margin-bottom: 0.9rem; }
+    .field input, .field select { width: 100%; }
+    .login-card .btn { width: 100%; justify-content: center; margin-top: 0.4rem; padding: 0.75rem; }
+
+    .teacher-cards {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.4rem;
+    }
+    @media (max-width: 900px) { .teacher-cards { grid-template-columns: 1fr; } }
+    .teacher-card {
+      background: var(--cream); border: 1px solid var(--line); border-radius: 12px;
+      padding: 1.1rem 1.2rem;
+    }
+    .teacher-card h3 {
+      font-family: "Fraunces", serif; font-size: 1.15rem; color: var(--umber); margin-bottom: 0.75rem;
+    }
+    .mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; }
+    .mini-stats div {
+      background: var(--stone); border-radius: 8px; padding: 0.55rem 0.65rem;
+    }
+    .mini-stats .n { font-family: "Fraunces", serif; font-size: 1.35rem; color: var(--umber); }
+    .mini-stats .l { font-size: 0.72rem; color: var(--muted); }
+
+    /* Quick add drawer */
+    .drawer-backdrop {
+      display: none; position: fixed; inset: 0; background: rgba(44,36,28,0.35); z-index: 80;
+    }
+    .drawer-backdrop.open { display: block; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: min(400px, 100%);
+      background: var(--cream); z-index: 90; border-left: 1px solid var(--line);
+      transform: translateX(100%); transition: transform 0.22s ease;
+      display: flex; flex-direction: column; padding: 1.25rem 1.35rem;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer h2 { font-family: "Fraunces", serif; color: var(--umber); font-size: 1.45rem; }
+    .drawer .hint { font-size: 0.82rem; color: var(--muted); margin: 0.35rem 0 1.1rem; }
+    .drawer .row { margin-bottom: 0.95rem; }
+    .drawer .row label { margin-bottom: 0.35rem; }
+    .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .chip {
+      border: 1px solid var(--line); background: white; color: var(--ink);
+      padding: 0.45rem 0.75rem; border-radius: 999px; font: inherit; font-size: 0.85rem; cursor: pointer;
+    }
+    .chip.on { background: var(--terracotta); border-color: var(--terracotta); color: white; }
+    .chip.time.on { background: var(--olive); border-color: var(--olive); }
+    .drawer-actions {
+      margin-top: auto; display: flex; flex-direction: column; gap: 0.5rem; padding-top: 1rem;
+    }
+    .drawer-actions .row-btns { display: flex; gap: 0.5rem; }
+    .drawer-actions .row-btns .btn { flex: 1; justify-content: center; }
+    .check-row {
+      display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; color: var(--ink);
+      margin-top: 0.25rem;
+    }
+    .check-row input { width: auto; min-width: 0; }
+    .cell { cursor: pointer; }
+    .cell:hover { outline: 2px dashed var(--clay); outline-offset: -2px; }
+    .cell .add-hint {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); font-size: 0.7rem; pointer-events: none;
+      background: rgba(250, 246, 240, 0.55); border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-bar">
+    <span>Revised demo — click screens</span>
+    <button type="button" data-screen="login" class="active">Login</button>
+    <button type="button" data-screen="dashboard">Dashboard</button>
+    <button type="button" data-screen="schedule">Schedule</button>
+    <button type="button" data-screen="attendance">Attendance</button>
+    <button type="button" data-screen="teachers">Teachers</button>
+  </div>
+  <p class="note">
+    Teachers page · Attendance Confirm + Apply leave stub · Quick-add class drawer (click cell or Add class)
+  </p>
+
+  <!-- LOGIN -->
+  <section id="login" class="screen active">
+    <div class="login-card">
+      <span class="brand">Studio Hours</span>
+      <p>Owner or teacher sign in</p>
+      <div class="field">
+        <label>Sign in as (demo only)</label>
+        <select id="rolePick">
+          <option value="dashboard">Owner — admin@studio.local</option>
+          <option value="attendance">Teacher — jane@studio.local</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" value="••••••••" />
+      </div>
+      <button class="btn btn-primary" type="button" id="signInBtn">Sign in</button>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="screen">
+    <nav class="app-nav">
+      <div class="brand">Studio Hours</div>
+      <a href="#" class="on" data-screen="dashboard">Dashboard</a>
+      <a href="#" data-screen="schedule">Schedule</a>
+      <a href="#" data-screen="attendance">Attendance</a>
+      <a href="#" data-screen="teachers">Teachers</a>
+      <span class="role-tag">Owner</span>
+      <span class="user">admin@studio.local</span>
+    </nav>
+    <div class="wrap">
+      <div class="page-head"><h1>Dashboard</h1></div>
+      <div class="filters">
+        <div>
+          <label>Month</label>
+          <select>
+            <option selected>July 2026</option>
+            <option>June 2026</option>
+            <option>May 2026</option>
+            <option>April 2026</option>
+            <option>March 2026</option>
+            <option>February 2026</option>
+            <option>January 2026</option>
+            <option>December 2025</option>
+            <option>November 2025</option>
+            <option>October 2025</option>
+            <option>September 2025</option>
+            <option>August 2025</option>
+          </select>
+        </div>
+        <div>
+          <label>Studio</label>
+          <select><option>All studios</option><option>Downtown</option><option>West Side</option></select>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat s1"><div class="n">42</div><div class="l">Classes scheduled</div></div>
+        <div class="stat s2"><div class="n">38</div><div class="l">Attendance confirmed</div></div>
+        <div class="stat s3"><div class="n">412</div><div class="l">Student visits</div></div>
+        <div class="stat s4"><div class="n">5</div><div class="l">With substitute</div></div>
+      </div>
+      <div class="panel">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Class</th><th>Studio</th><th>Original</th><th>Substitute</th><th>Students</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Jul 24 · 09:00</td><td>Vinyasa</td><td>Downtown</td>
+              <td>Jane Lee</td><td class="muted">—</td><td>14</td>
+            </tr>
+            <tr>
+              <td>Jul 24 · 18:00</td><td>Yin</td><td>Downtown</td>
+              <td>Mark Tan</td><td><span class="sub">Ava Chen</span></td><td>9</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEACHERS (owner) -->
+  <section id="teachers" class="screen">
+    <nav class="app-nav">
+      <div class="brand">Studio Hours</div>
+      <a href="#" data-screen="dashboard">Dashboard</a>
+      <a href="#" data-screen="schedule">Schedule</a>
+      <a href="#" data-screen="attendance">Attendance</a>
+      <a href="#" class="on" data-screen="teachers">Teachers</a>
+      <span class="role-tag">Owner</span>
+      <span class="user">admin@studio.local</span>
+    </nav>
+    <div class="wrap">
+      <div class="page-head"><h1>Teachers</h1></div>
+      <div class="filters">
+        <div>
+          <label>Month</label>
+          <select>
+            <option selected>July 2026</option>
+            <option>June 2026</option>
+            <option>May 2026</option>
+            <option>April 2026</option>
+            <option>March 2026</option>
+            <option>February 2026</option>
+            <option>January 2026</option>
+            <option>December 2025</option>
+            <option>November 2025</option>
+            <option>October 2025</option>
+            <option>September 2025</option>
+            <option>August 2025</option>
+          </select>
+        </div>
+      </div>
+      <div class="teacher-cards">
+        <div class="teacher-card">
+          <h3>Jane Lee</h3>
+          <div class="mini-stats">
+            <div><div class="n">18</div><div class="l">Classes scheduled</div></div>
+            <div><div class="n">16</div><div class="l">Confirmed</div></div>
+            <div><div class="n">194</div><div class="l">Student visits</div></div>
+            <div><div class="n">2</div><div class="l">As substitute</div></div>
+          </div>
+        </div>
+        <div class="teacher-card">
+          <h3>Mark Tan</h3>
+          <div class="mini-stats">
+            <div><div class="n">14</div><div class="l">Classes scheduled</div></div>
+            <div><div class="n">13</div><div class="l">Confirmed</div></div>
+            <div><div class="n">151</div><div class="l">Student visits</div></div>
+            <div><div class="n">1</div><div class="l">As substitute</div></div>
+          </div>
+        </div>
+        <div class="teacher-card">
+          <h3>Ava Chen</h3>
+          <div class="mini-stats">
+            <div><div class="n">10</div><div class="l">Classes scheduled</div></div>
+            <div><div class="n">9</div><div class="l">Confirmed</div></div>
+            <div><div class="n">87</div><div class="l">Student visits</div></div>
+            <div><div class="n">3</div><div class="l">As substitute</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <table>
+          <thead>
+            <tr>
+              <th>Teacher</th><th>Scheduled</th><th>Confirmed</th><th>Student visits</th><th>As substitute</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Jane Lee</td><td>18</td><td>16</td><td>194</td><td>2</td></tr>
+            <tr><td>Mark Tan</td><td>14</td><td>13</td><td>151</td><td>1</td></tr>
+            <tr><td>Ava Chen</td><td>10</td><td>9</td><td>87</td><td>3</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCHEDULE -->
+  <section id="schedule" class="screen">
+    <nav class="app-nav">
+      <div class="brand">Studio Hours</div>
+      <a href="#" data-screen="dashboard">Dashboard</a>
+      <a href="#" class="on" data-screen="schedule">Schedule</a>
+      <a href="#" data-screen="attendance">Attendance</a>
+      <a href="#" data-screen="teachers">Teachers</a>
+      <span class="role-tag">Owner</span>
+      <span class="user">admin@studio.local</span>
+    </nav>
+    <div class="wrap">
+      <div class="page-head">
+        <h1>Schedule</h1>
+        <div class="week-nav">
+          <button class="btn btn-ghost" type="button">← Prev</button>
+          <strong>Jul 20 – 26</strong>
+          <button class="btn btn-ghost" type="button">Next →</button>
+          <button class="btn btn-primary" type="button" id="openAddClass">Add class</button>
+        </div>
+      </div>
+      <p class="muted" style="font-size:0.88rem;margin-bottom:0.85rem;">
+        Tip: click an empty cell to add a class — studio &amp; date fill in for you.
+      </p>
+      <div class="cal">
+        <div></div>
+        <div class="cal-head">Mon 20</div><div class="cal-head">Tue 21</div><div class="cal-head">Wed 22</div>
+        <div class="cal-head">Thu 23</div><div class="cal-head">Fri 24</div><div class="cal-head">Sat 25</div><div class="cal-head">Sun 26</div>
+        <div class="cal-studio">Downtown</div>
+        <div class="cell" data-studio="Downtown" data-date="2026-07-20">
+          <div class="band"><div class="band-label">Morning</div><div class="block vinyasa"><div class="block-time">09:00</div><div class="block-name">Vinyasa (12)</div><div class="block-teacher">Jane Lee</div></div></div>
+          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+        </div>
+        <div class="cell" data-studio="Downtown" data-date="2026-07-21">
+          <div class="band"><div class="band-label">Morning</div><div class="block yin has-sub"><div class="block-time">10:00</div><div class="block-name">Yin (8)</div><div class="block-teacher">Mark Tan</div><div class="block-sub">(Ava Chen)</div></div></div>
+          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+        </div>
+        <div class="cell" data-studio="Downtown" data-date="2026-07-22">
+          <div class="band"><div class="band-label">Morning</div><div class="block restore"><div class="block-time">09:00</div><div class="block-name">Restore (10)</div><div class="block-teacher">Jane Lee</div></div></div>
+          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+        </div>
+        <div class="cell" data-studio="Downtown" data-date="2026-07-23">
+          <div class="band"><div class="band-label">Morning</div><div class="band-empty">—</div></div>
+          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="block vinyasa"><div class="block-time">18:00</div><div class="block-name">Vinyasa (15)</div><div class="block-teacher">Mark Tan</div></div></div>
+        </div>
+        <div class="cell" data-studio="Downtown" data-date="2026-07-24">
+          <div class="band"><div class="band-label">Morning</div><div class="block beginner"><div class="block-time">09:00</div><div class="block-name">Beginner (11)</div><div class="block-teacher">Jane Lee</div></div></div>
+          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="block yin has-sub"><div class="block-time">17:30</div><div class="block-name">Yin (7)</div><div class="block-teacher">Mark Tan</div><div class="block-sub">(Jane Lee)</div></div></div>
+        </div>
+        <div class="cell" data-studio="Downtown" data-date="2026-07-25">
+          <div class="band"><div class="band-label">Morning</div><div class="block vinyasa"><div class="block-time">10:00</div><div class="block-name">Vinyasa (13)</div><div class="block-teacher">Mark Tan</div></div></div>
+          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+        </div>
+        <div class="cell" data-studio="Downtown" data-date="2026-07-26">
+          <div class="band"><div class="band-label">Morning</div><div class="block restore"><div class="block-time">09:30</div><div class="block-name">Restore (9)</div><div class="block-teacher">Jane Lee</div></div></div>
+          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+        </div>
+        <div class="cal-studio">West Side</div>
+        <div class="cell" data-studio="West Side" data-date="2026-07-20">
+          <div class="band"><div class="band-label">Morning</div><div class="block yin"><div class="block-time">11:00</div><div class="block-name">Yin (6)</div><div class="block-teacher">Jane Lee</div></div></div>
+          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+        </div>
+        <div class="cell" data-studio="West Side" data-date="2026-07-21">
+          <div class="band"><div class="band-label">Morning</div><div class="block beginner"><div class="block-time">09:00</div><div class="block-name">Beginner (14)</div><div class="block-teacher">Mark Tan</div></div></div>
+          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+        </div>
+        <div class="cell" data-studio="West Side" data-date="2026-07-22">
+          <div class="band"><div class="band-label">Morning</div><div class="band-empty">—</div></div>
+          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="block restore has-sub"><div class="block-time">18:00</div><div class="block-name">Restore (5)</div><div class="block-teacher">Mark Tan</div><div class="block-sub">(Ava Chen)</div></div></div>
+        </div>
+        <div class="cell" data-studio="West Side" data-date="2026-07-23">
+          <div class="band"><div class="band-label">Morning</div><div class="block beginner"><div class="block-time">10:00</div><div class="block-name">Beginner (12)</div><div class="block-teacher">Jane Lee</div></div></div>
+          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+        </div>
+        <div class="cell" data-studio="West Side" data-date="2026-07-24">
+          <div class="band"><div class="band-label">Morning</div><div class="block vinyasa"><div class="block-time">09:00</div><div class="block-name">Vinyasa (16)</div><div class="block-teacher">Mark Tan</div></div></div>
+          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+        </div>
+        <div class="cell" data-studio="West Side" data-date="2026-07-25">
+          <div class="band"><div class="band-label">Morning</div><div class="band-empty">—</div></div>
+          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+          <span class="add-hint">+ Add</span>
+        </div>
+        <div class="cell" data-studio="West Side" data-date="2026-07-26">
+          <div class="band"><div class="band-label">Morning</div><div class="band-empty">—</div></div>
+          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+          <span class="add-hint">+ Add</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Add Class drawer -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer" id="addDrawer" aria-label="Add class">
+    <h2>Quick add class</h2>
+    <p class="hint">Few taps — stays on your schedule. Click a cell to pre-fill studio &amp; date.</p>
+    <div class="row">
+      <label>Studio</label>
+      <select id="addStudio">
+        <option>Downtown</option>
+        <option>West Side</option>
+      </select>
+    </div>
+    <div class="row">
+      <label>Date</label>
+      <input type="date" id="addDate" value="2026-07-24" />
+    </div>
+    <div class="row">
+      <label>Time</label>
+      <div class="chips" id="timeChips">
+        <button type="button" class="chip time on" data-time="09:00">09:00</button>
+        <button type="button" class="chip time" data-time="10:00">10:00</button>
+        <button type="button" class="chip time" data-time="11:00">11:00</button>
+        <button type="button" class="chip time" data-time="17:30">17:30</button>
+        <button type="button" class="chip time" data-time="18:00">18:00</button>
+        <button type="button" class="chip time" data-time="19:00">19:00</button>
+      </div>
+    </div>
+    <div class="row">
+      <label>Class type</label>
+      <div class="chips" id="typeChips">
+        <button type="button" class="chip on" data-type="Vinyasa">Vinyasa</button>
+        <button type="button" class="chip" data-type="Yin">Yin</button>
+        <button type="button" class="chip" data-type="Beginner">Beginner</button>
+        <button type="button" class="chip" data-type="Restore">Restore</button>
+      </div>
+    </div>
+    <div class="row">
+      <label>Teacher</label>
+      <select id="addTeacher">
+        <option>Jane Lee</option>
+        <option>Mark Tan</option>
+        <option>Ava Chen</option>
+      </select>
+    </div>
+    <div class="row">
+      <label>Expected students</label>
+      <input type="number" id="addStudents" min="1" value="16" style="width:100px;min-width:100px;" />
+    </div>
+    <label class="check-row">
+      <input type="checkbox" id="addRepeat" />
+      Repeat same slot for next 4 weeks
+    </label>
+    <div class="drawer-actions">
+      <div class="row-btns">
+        <button class="btn btn-ghost" type="button" id="closeDrawer">Cancel</button>
+        <button class="btn btn-primary" type="button" id="saveClass">Save</button>
+      </div>
+      <button class="btn btn-olive" type="button" id="saveAnother">Save &amp; add another</button>
+      <div id="addToast" class="toast">Class added to schedule.</div>
+    </div>
+  </aside>
+
+  <!-- ATTENDANCE (teacher) -->
+  <section id="attendance" class="screen">
+    <nav class="app-nav">
+      <div class="brand">Studio Hours</div>
+      <a href="#" data-screen="dashboard">Dashboard</a>
+      <a href="#" data-screen="schedule">Schedule</a>
+      <a href="#" class="on" data-screen="attendance">Attendance</a>
+      <a href="#" data-screen="teachers">Teachers</a>
+      <span class="role-tag">Teacher</span>
+      <span class="user">jane@studio.local</span>
+    </nav>
+    <div class="wrap">
+      <div class="page-head">
+        <h1>My upcoming classes</h1>
+      </div>
+      <div class="att-toolbar">
+        <p class="muted" style="font-size:0.92rem;max-width:36rem;">
+          Enter how many students attended, then press Confirm. Use Apply leave if you cannot teach (details later).
+        </p>
+        <button class="btn btn-ghost" type="button" id="applyLeaveBtn">Apply leave</button>
+      </div>
+      <div id="leaveToast" class="toast warn">
+        Leave request — coming soon. We’ll plan the full leave & cover flow in a later version.
+      </div>
+      <div class="att-list" style="margin-top:1rem;">
+        <div class="att-row" data-att>
+          <div>
+            <strong>Today · 09:00 · Vinyasa</strong>
+            <div class="att-meta">Downtown · You are original teacher · Expected 16</div>
+          </div>
+          <div class="att-actions">
+            <div>
+              <label>Students</label>
+              <input type="number" min="0" value="14" />
+            </div>
+            <button class="btn btn-olive btn-sm" type="button" data-confirm>Confirm</button>
+            <span class="ok" data-done hidden>Confirmed</span>
+          </div>
+        </div>
+        <div class="att-row" data-att>
+          <div>
+            <strong>Today · 17:30 · Yin</strong>
+            <div class="att-meta">Downtown · You are substitute for Mark Tan · Expected 10</div>
+          </div>
+          <div class="att-actions">
+            <div>
+              <label>Students</label>
+              <input type="number" min="0" value="7" />
+            </div>
+            <button class="btn btn-olive btn-sm" type="button" data-confirm>Confirm</button>
+            <span class="ok" data-done hidden>Confirmed</span>
+          </div>
+        </div>
+        <div class="att-row" data-att>
+          <div>
+            <strong>Sat 25 · 10:00 · Beginner</strong>
+            <div class="att-meta">West Side · You are original teacher · Expected 12</div>
+          </div>
+          <div class="att-actions">
+            <div>
+              <label>Students</label>
+              <input type="number" min="0" value="" placeholder="—" />
+            </div>
+            <button class="btn btn-olive btn-sm" type="button" data-confirm>Confirm</button>
+            <span class="ok" data-done hidden>Confirmed</span>
+          </div>
+        </div>
+      </div>
+      <div id="confirmToast" class="toast">Attendance confirmed for this class.</div>
+    </div>
+  </section>
+
+  <script>
+    function showScreen(id) {
+      document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
+      document.querySelectorAll(".demo-bar button").forEach((b) => {
+        b.classList.toggle("active", b.dataset.screen === id);
+      });
+      const el = document.getElementById(id);
+      if (el) el.classList.add("active");
+    }
+    document.querySelectorAll("[data-screen]").forEach((el) => {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        showScreen(el.dataset.screen);
+      });
+    });
+    document.getElementById("signInBtn").addEventListener("click", () => {
+      showScreen(document.getElementById("rolePick").value);
+    });
+    const applyLeaveBtn = document.getElementById("applyLeaveBtn");
+    if (applyLeaveBtn) {
+      applyLeaveBtn.addEventListener("click", () => {
+        const t = document.getElementById("leaveToast");
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 4000);
+      });
+    }
+    document.querySelectorAll("[data-att]").forEach((row) => {
+      const conf = row.querySelector("[data-confirm]");
+      if (!conf) return;
+      conf.addEventListener("click", () => {
+        const done = row.querySelector("[data-done]");
+        conf.hidden = true;
+        done.hidden = false;
+        const t = document.getElementById("confirmToast");
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2500);
+      });
+    });
+
+    /* Quick add class drawer */
+    const drawer = document.getElementById("addDrawer");
+    const backdrop = document.getElementById("drawerBackdrop");
+    const addStudio = document.getElementById("addStudio");
+    const addDate = document.getElementById("addDate");
+    const addToast = document.getElementById("addToast");
+
+    function openDrawer(studio, date) {
+      showScreen("schedule");
+      if (studio) addStudio.value = studio;
+      if (date) addDate.value = date;
+      drawer.classList.add("open");
+      backdrop.classList.add("open");
+    }
+    function closeDrawer() {
+      drawer.classList.remove("open");
+      backdrop.classList.remove("open");
+      addToast.classList.remove("show");
+    }
+    function flashAdded() {
+      addToast.classList.add("show");
+      setTimeout(() => addToast.classList.remove("show"), 2000);
+    }
+
+    document.getElementById("openAddClass").addEventListener("click", () => openDrawer());
+    document.getElementById("closeDrawer").addEventListener("click", closeDrawer);
+    backdrop.addEventListener("click", closeDrawer);
+
+    document.querySelectorAll(".cell[data-studio]").forEach((cell) => {
+      cell.addEventListener("click", (e) => {
+        if (e.target.closest(".block")) return; // edit later; empty / add for now
+        openDrawer(cell.dataset.studio, cell.dataset.date);
+      });
+    });
+
+    document.querySelectorAll("#timeChips .chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll("#timeChips .chip").forEach((c) => c.classList.remove("on"));
+        chip.classList.add("on");
+      });
+    });
+    document.querySelectorAll("#typeChips .chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll("#typeChips .chip").forEach((c) => c.classList.remove("on"));
+        chip.classList.add("on");
+        const defaults = { Vinyasa: 16, Yin: 12, Beginner: 14, Restore: 10 };
+        document.getElementById("addStudents").value = defaults[chip.dataset.type] || 12;
+      });
+    });
+
+    document.getElementById("saveClass").addEventListener("click", () => {
+      flashAdded();
+      setTimeout(closeDrawer, 600);
+    });
+    document.getElementById("saveAnother").addEventListener("click", () => {
+      flashAdded();
+      // bump selected time chip to next preset if possible
+      const times = [...document.querySelectorAll("#timeChips .chip")];
+      const idx = times.findIndex((c) => c.classList.contains("on"));
+      if (idx >= 0 && idx < times.length - 1) {
+        times[idx].classList.remove("on");
+        times[idx + 1].classList.add("on");
+      }
+    });
+  </script>
+</body>
+</html>

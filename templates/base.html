@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Studio Hours{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'css/app.css' %}" />
+</head>
+<body>
+  {% if user.is_authenticated %}
+  <nav class="app-nav">
+    <div class="brand">Studio Hours</div>
+    {% if user.is_owner %}
+      <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}on{% endif %}">Dashboard</a>
+      <a href="{% url 'schedule' %}" class="{% if request.resolver_match.url_name == 'schedule' %}on{% endif %}">Schedule</a>
+      <a href="{% url 'attendance' %}" class="{% if request.resolver_match.url_name == 'attendance' %}on{% endif %}">Attendance</a>
+      <a href="{% url 'teachers' %}" class="{% if request.resolver_match.url_name == 'teachers' %}on{% endif %}">Teachers</a>
+      <span class="role-tag">Owner</span>
+    {% else %}
+      <a href="{% url 'attendance' %}" class="{% if request.resolver_match.url_name == 'attendance' %}on{% endif %}">Attendance</a>
+      <a href="{% url 'schedule' %}" class="{% if request.resolver_match.url_name == 'schedule' %}on{% endif %}">Schedule</a>
+      <span class="role-tag">Teacher</span>
+    {% endif %}
+    <span class="user">{{ user.get_username }}</span>
+    <form action="{% url 'logout' %}" method="post" class="inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-ghost btn-sm">Log out</button>
+    </form>
+  </nav>
+  {% endif %}
+
+  {% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+      <div class="toast show {% if message.tags == 'error' %}warn{% elif message.tags == 'info' %}warn{% endif %}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</body>
+</html>

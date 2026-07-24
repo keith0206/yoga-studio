@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Studio Hours{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="page-head"><h1>Dashboard</h1></div>
+  <form class="filters" method="get">
+    <div>
+      <label>Month</label>
+      <select name="month" onchange="this.form.submit()">
+        {% for value, label in month_choices %}
+          <option value="{{ value }}" {% if value == month_value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>Studio</label>
+      <select name="studio" onchange="this.form.submit()">
+        <option value="">All studios</option>
+        {% for s in studios %}
+          <option value="{{ s.id }}" {% if studio_id == s.id|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+  <div class="stats">
+    <div class="stat s1"><div class="n">{{ stats.scheduled }}</div><div class="l">Classes scheduled</div></div>
+    <div class="stat s2"><div class="n">{{ stats.confirmed }}</div><div class="l">Attendance confirmed</div></div>
+    <div class="stat s3"><div class="n">{{ stats.student_visits }}</div><div class="l">Student visits</div></div>
+    <div class="stat s4"><div class="n">{{ stats.with_sub }}</div><div class="l">With substitute</div></div>
+  </div>
+  <div class="panel">
+    <table>
+      <thead>
+        <tr><th>Date</th><th>Class</th><th>Studio</th><th>Original</th><th>Substitute</th><th>Students</th></tr>
+      </thead>
+      <tbody>
+        {% for s in sessions %}
+        <tr>
+          <td>{{ s.start_at|date:"M j · H:i" }}</td>
+          <td>{{ s.class_type.name }}</td>
+          <td>{{ s.studio.name }}</td>
+          <td>{{ s.original_teacher.name }}</td>
+          <td>{% if s.substitute_teacher %}<span class="sub">{{ s.substitute_teacher.name }}</span>{% else %}<span class="muted">—</span>{% endif %}</td>
+          <td>{% if s.attendance %}{{ s.attendance.students_attended }}{% else %}<span class="muted">Not submitted</span>{% endif %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="muted">No classes this month.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

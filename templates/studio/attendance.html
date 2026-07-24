@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Attendance — Studio Hours{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="page-head">
+    <h1>My upcoming classes</h1>
+  </div>
+  <div class="att-toolbar">
+    <p class="muted">{{ role_note }} — enter students attended, then Confirm.</p>
+    <form method="post" action="{% url 'apply_leave' %}">
+      {% csrf_token %}
+      <button class="btn btn-ghost" type="submit">Apply leave</button>
+    </form>
+  </div>
+
+  <div class="att-list">
+    {% for s in sessions %}
+    <div class="att-row">
+      <div>
+        <strong>{{ s.start_at|date:"D M j · H:i" }} · {{ s.class_type.name }}</strong>
+        <div class="att-meta">
+          {{ s.studio.name }} ·
+          {% if s.substitute_teacher %}
+            {% if teacher and s.substitute_teacher_id == teacher.id %}
+              You are substitute for {{ s.original_teacher.name }}
+            {% else %}
+              Orig: {{ s.original_teacher.name }} · Sub: {{ s.substitute_teacher.name }}
+            {% endif %}
+          {% else %}
+            Orig: {{ s.original_teacher.name }}
+          {% endif %}
+          · Expected {{ s.expected_students }}
+        </div>
+      </div>
+      <div class="att-actions">
+        {% if s.attendance %}
+          <span class="ok">Confirmed · {{ s.attendance.students_attended }} students</span>
+          <form method="post" action="{% url 'confirm_attendance' s.id %}" class="att-actions">
+            {% csrf_token %}
+            <div>
+              <label>Update</label>
+              <input type="number" name="students_attended" min="0" value="{{ s.attendance.students_attended }}" />
+            </div>
+            <button class="btn btn-olive btn-sm" type="submit">Confirm</button>
+          </form>
+        {% else %}
+          <form method="post" action="{% url 'confirm_attendance' s.id %}" class="att-actions">
+            {% csrf_token %}
+            <div>
+              <label>Students</label>
+              <input type="number" name="students_attended" min="0" value="{{ s.expected_students }}" required />
+            </div>
+            <button class="btn btn-olive btn-sm" type="submit">Confirm</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+    {% empty %}
+    <p class="muted">No upcoming classes.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
