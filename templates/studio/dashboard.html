@@ -21,6 +21,15 @@
         {% endfor %}
       </select>
     </div>
+    <div>
+      <label>Teacher</label>
+      <select name="teacher" onchange="this.form.submit()">
+        <option value="">All teachers</option>
+        {% for t in teachers %}
+          <option value="{{ t.id }}" {% if teacher_id == t.id|stringformat:"s" %}selected{% endif %}>{{ t.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
   </form>
   <div class="stats">
     <div class="stat s1"><div class="n">{{ stats.scheduled }}</div><div class="l">Classes scheduled</div></div>

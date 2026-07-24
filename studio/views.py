@@ -79,6 +79,7 @@ def dashboard(request):
     month_value = request.GET.get("month")
     year, month = _parse_month(month_value)
     studio_id = request.GET.get("studio") or ""
+    teacher_id = request.GET.get("teacher") or ""
 
     start = timezone.make_aware(datetime(year, month, 1))
     last_day = monthrange(year, month)[1]
@@ -101,6 +102,11 @@ def dashboard(request):
     )
     if studio_id:
         sessions = sessions.filter(studio_id=studio_id)
+    if teacher_id:
+        sessions = sessions.filter(
+            Q(original_teacher_id=teacher_id, substitute_teacher__isnull=True)
+            | Q(substitute_teacher_id=teacher_id)
+        )
 
     scheduled = sessions.count()
     confirmed = sessions.filter(attendance__isnull=False).count()
@@ -117,6 +123,8 @@ def dashboard(request):
             "month_value": f"{year:04d}-{month:02d}",
             "studios": Studio.objects.filter(is_active=True),
             "studio_id": studio_id,
+            "teachers": Teacher.objects.filter(is_active=True),
+            "teacher_id": teacher_id,
             "stats": {
                 "scheduled": scheduled,
                 "confirmed": confirmed,
