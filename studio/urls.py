@@ -26,5 +26,4 @@ urlpatterns = [
         name="confirm_attendance",
     ),
     path("attendance/apply-leave/", views.apply_leave, name="apply_leave"),
-    path("health/", views.health, name="health"),
 ]

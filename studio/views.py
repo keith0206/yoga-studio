@@ -468,8 +468,3 @@ def apply_leave(request):
     )
     return redirect("attendance")
 
-
-def health(request):
-    from django.http import HttpResponse
-
-    return HttpResponse("ok")
