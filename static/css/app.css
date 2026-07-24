@@ -109,7 +109,7 @@ td { padding: 0.8rem 1rem; border-top: 1px solid var(--line); vertical-align: mi
 .cell {
   position: relative;
   min-height: 160px; background: white; border: 1px solid var(--line);
-  border-radius: 10px; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.55rem;
+  border-radius: 10px; padding: 0.55rem 0.5rem; display: flex; flex-direction: column; gap: 0.65rem;
   cursor: pointer;
 }
 .cell:hover { outline: 2px dashed var(--clay); outline-offset: -2px; }
@@ -120,26 +120,28 @@ td { padding: 0.8rem 1rem; border-top: 1px solid var(--line); vertical-align: mi
   background: rgba(250, 246, 240, 0.55); border-radius: 10px;
 }
 .band {
-  display: flex; flex-direction: column; gap: 0.4rem; flex: 1;
-  min-height: 3.6rem; padding: 0.15rem 0.1rem;
+  display: flex; flex-direction: column; gap: 0.45rem;
+  flex: 0 0 auto;
+  min-width: 0;
 }
-.band-pm {
+.band + .band {
   border-top: 1px dashed var(--line);
-  margin-top: 0.15rem;
-  padding-top: 0.55rem;
+  padding-top: 0.65rem;
+  margin-top: 0;
 }
 .band-label {
   font-size: 0.58rem; font-weight: 600; letter-spacing: 0.04em;
-  text-transform: uppercase; color: var(--muted); line-height: 1;
-  margin-bottom: 0.1rem;
+  text-transform: uppercase; color: var(--muted); line-height: 1.2;
+  flex: 0 0 auto;
 }
 .band-empty {
-  color: var(--line); font-size: 0.7rem; line-height: 1; padding: 0.2rem 0;
+  color: var(--line); font-size: 0.7rem; line-height: 1; padding: 0.15rem 0;
+  flex: 0 0 auto;
 }
 .block {
   border-radius: 8px; padding: 0.4rem 0.45rem; color: white;
   font-size: 0.65rem; line-height: 1.35;
-  margin: 0;
+  flex: 0 0 auto;
 }
 .block-time {
   display: block; font-size: 0.72rem; font-weight: 700; line-height: 1.2;

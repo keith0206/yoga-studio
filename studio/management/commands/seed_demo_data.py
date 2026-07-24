@@ -95,6 +95,7 @@ class Command(BaseCommand):
             (1, downtown, "10:00", "Yin", "Mark Tan"),
             (2, downtown, "09:00", "Restore", "Jane Lee"),
             (3, downtown, "18:00", "Vinyasa", "Mark Tan"),
+            (3, downtown, "19:15", "Beginner", "Jane Lee"),
             (4, downtown, "09:00", "Beginner", "Jane Lee"),
             (4, downtown, "17:30", "Yin", "Mark Tan"),
             (5, downtown, "10:00", "Vinyasa", "Mark Tan"),

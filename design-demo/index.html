@@ -120,29 +120,31 @@
     .cell {
       position: relative;
       min-height: 160px; background: white; border: 1px solid var(--line);
-      border-radius: 10px; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.55rem;
+      border-radius: 10px; padding: 0.55rem 0.5rem; display: flex; flex-direction: column; gap: 0.65rem;
     }
     .band {
-      display: flex; flex-direction: column; gap: 0.4rem; flex: 1;
-      min-height: 3.6rem; padding: 0.15rem 0.1rem;
+      display: flex; flex-direction: column; gap: 0.45rem;
+      flex: 0 0 auto;
+      min-width: 0;
     }
-    .band-pm {
+    .band + .band {
       border-top: 1px dashed var(--line);
-      margin-top: 0.15rem;
-      padding-top: 0.55rem;
+      padding-top: 0.65rem;
+      margin-top: 0;
     }
     .band-label {
       font-size: 0.58rem; font-weight: 600; letter-spacing: 0.04em;
-      text-transform: uppercase; color: var(--muted); line-height: 1;
-      margin-bottom: 0.1rem;
+      text-transform: uppercase; color: var(--muted); line-height: 1.2;
+      flex: 0 0 auto;
     }
     .band-empty {
-      color: var(--line); font-size: 0.7rem; line-height: 1; padding: 0.2rem 0;
+      color: var(--line); font-size: 0.7rem; line-height: 1; padding: 0.15rem 0;
+      flex: 0 0 auto;
     }
     .block {
       border-radius: 8px; padding: 0.4rem 0.45rem; color: white;
       font-size: 0.65rem; line-height: 1.35;
-      margin: 0;
+      flex: 0 0 auto;
     }
     .block-time {
       display: block; font-size: 0.72rem; font-weight: 700; line-height: 1.2;
@@ -471,62 +473,62 @@
         <div class="cal-head">Thu 23</div><div class="cal-head">Fri 24</div><div class="cal-head">Sat 25</div><div class="cal-head">Sun 26</div>
         <div class="cal-studio">Downtown</div>
         <div class="cell" data-studio="Downtown" data-date="2026-07-20">
-          <div class="band"><div class="band-label">Morning</div><div class="block vinyasa"><div class="block-time">09:00</div><div class="block-name">Vinyasa (12)</div><div class="block-teacher">Jane Lee</div></div></div>
-          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+          <div class="band"><div class="band-label">Morning</div><div class="block vinyasa"><div class="block-time">09:00 (12)</div><div class="block-name">Vinyasa</div><div class="block-teacher">Jane Lee</div></div></div>
+          <div class="band"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
         </div>
         <div class="cell" data-studio="Downtown" data-date="2026-07-21">
-          <div class="band"><div class="band-label">Morning</div><div class="block yin has-sub"><div class="block-time">10:00</div><div class="block-name">Yin (8)</div><div class="block-teacher">Mark Tan</div><div class="block-sub">(Ava Chen)</div></div></div>
-          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+          <div class="band"><div class="band-label">Morning</div><div class="block yin has-sub"><div class="block-time">10:00 (8)</div><div class="block-name">Yin</div><div class="block-teacher">Mark Tan</div><div class="block-sub">(Ava Chen)</div></div></div>
+          <div class="band"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
         </div>
         <div class="cell" data-studio="Downtown" data-date="2026-07-22">
-          <div class="band"><div class="band-label">Morning</div><div class="block restore"><div class="block-time">09:00</div><div class="block-name">Restore (10)</div><div class="block-teacher">Jane Lee</div></div></div>
-          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+          <div class="band"><div class="band-label">Morning</div><div class="block restore"><div class="block-time">09:00 (10)</div><div class="block-name">Restore</div><div class="block-teacher">Jane Lee</div></div></div>
+          <div class="band"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
         </div>
         <div class="cell" data-studio="Downtown" data-date="2026-07-23">
           <div class="band"><div class="band-label">Morning</div><div class="band-empty">—</div></div>
-          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="block vinyasa"><div class="block-time">18:00</div><div class="block-name">Vinyasa (15)</div><div class="block-teacher">Mark Tan</div></div></div>
+          <div class="band"><div class="band-label">Afternoon</div><div class="block vinyasa"><div class="block-time">18:00 (15)</div><div class="block-name">Vinyasa</div><div class="block-teacher">Mark Tan</div></div><div class="block beginner"><div class="block-time">19:15 (14)</div><div class="block-name">Beginner</div><div class="block-teacher">Jane Lee</div></div></div>
         </div>
         <div class="cell" data-studio="Downtown" data-date="2026-07-24">
-          <div class="band"><div class="band-label">Morning</div><div class="block beginner"><div class="block-time">09:00</div><div class="block-name">Beginner (11)</div><div class="block-teacher">Jane Lee</div></div></div>
-          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="block yin has-sub"><div class="block-time">17:30</div><div class="block-name">Yin (7)</div><div class="block-teacher">Mark Tan</div><div class="block-sub">(Jane Lee)</div></div></div>
+          <div class="band"><div class="band-label">Morning</div><div class="block beginner"><div class="block-time">09:00 (11)</div><div class="block-name">Beginner</div><div class="block-teacher">Jane Lee</div></div></div>
+          <div class="band"><div class="band-label">Afternoon</div><div class="block yin has-sub"><div class="block-time">17:30 (7)</div><div class="block-name">Yin</div><div class="block-teacher">Mark Tan</div><div class="block-sub">(Jane Lee)</div></div></div>
         </div>
         <div class="cell" data-studio="Downtown" data-date="2026-07-25">
-          <div class="band"><div class="band-label">Morning</div><div class="block vinyasa"><div class="block-time">10:00</div><div class="block-name">Vinyasa (13)</div><div class="block-teacher">Mark Tan</div></div></div>
-          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+          <div class="band"><div class="band-label">Morning</div><div class="block vinyasa"><div class="block-time">10:00 (13)</div><div class="block-name">Vinyasa</div><div class="block-teacher">Mark Tan</div></div></div>
+          <div class="band"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
         </div>
         <div class="cell" data-studio="Downtown" data-date="2026-07-26">
-          <div class="band"><div class="band-label">Morning</div><div class="block restore"><div class="block-time">09:30</div><div class="block-name">Restore (9)</div><div class="block-teacher">Jane Lee</div></div></div>
-          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+          <div class="band"><div class="band-label">Morning</div><div class="block restore"><div class="block-time">09:30 (9)</div><div class="block-name">Restore</div><div class="block-teacher">Jane Lee</div></div></div>
+          <div class="band"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
         </div>
         <div class="cal-studio">West Side</div>
         <div class="cell" data-studio="West Side" data-date="2026-07-20">
-          <div class="band"><div class="band-label">Morning</div><div class="block yin"><div class="block-time">11:00</div><div class="block-name">Yin (6)</div><div class="block-teacher">Jane Lee</div></div></div>
-          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+          <div class="band"><div class="band-label">Morning</div><div class="block yin"><div class="block-time">11:00 (6)</div><div class="block-name">Yin</div><div class="block-teacher">Jane Lee</div></div></div>
+          <div class="band"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
         </div>
         <div class="cell" data-studio="West Side" data-date="2026-07-21">
-          <div class="band"><div class="band-label">Morning</div><div class="block beginner"><div class="block-time">09:00</div><div class="block-name">Beginner (14)</div><div class="block-teacher">Mark Tan</div></div></div>
-          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+          <div class="band"><div class="band-label">Morning</div><div class="block beginner"><div class="block-time">09:00 (14)</div><div class="block-name">Beginner</div><div class="block-teacher">Mark Tan</div></div></div>
+          <div class="band"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
         </div>
         <div class="cell" data-studio="West Side" data-date="2026-07-22">
           <div class="band"><div class="band-label">Morning</div><div class="band-empty">—</div></div>
-          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="block restore has-sub"><div class="block-time">18:00</div><div class="block-name">Restore (5)</div><div class="block-teacher">Mark Tan</div><div class="block-sub">(Ava Chen)</div></div></div>
+          <div class="band"><div class="band-label">Afternoon</div><div class="block restore has-sub"><div class="block-time">18:00 (5)</div><div class="block-name">Restore</div><div class="block-teacher">Mark Tan</div><div class="block-sub">(Ava Chen)</div></div></div>
         </div>
         <div class="cell" data-studio="West Side" data-date="2026-07-23">
-          <div class="band"><div class="band-label">Morning</div><div class="block beginner"><div class="block-time">10:00</div><div class="block-name">Beginner (12)</div><div class="block-teacher">Jane Lee</div></div></div>
-          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+          <div class="band"><div class="band-label">Morning</div><div class="block beginner"><div class="block-time">10:00 (12)</div><div class="block-name">Beginner</div><div class="block-teacher">Jane Lee</div></div></div>
+          <div class="band"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
         </div>
         <div class="cell" data-studio="West Side" data-date="2026-07-24">
-          <div class="band"><div class="band-label">Morning</div><div class="block vinyasa"><div class="block-time">09:00</div><div class="block-name">Vinyasa (16)</div><div class="block-teacher">Mark Tan</div></div></div>
-          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+          <div class="band"><div class="band-label">Morning</div><div class="block vinyasa"><div class="block-time">09:00 (16)</div><div class="block-name">Vinyasa</div><div class="block-teacher">Mark Tan</div></div></div>
+          <div class="band"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
         </div>
         <div class="cell" data-studio="West Side" data-date="2026-07-25">
           <div class="band"><div class="band-label">Morning</div><div class="band-empty">—</div></div>
-          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+          <div class="band"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
           <span class="add-hint">+ Add</span>
         </div>
         <div class="cell" data-studio="West Side" data-date="2026-07-26">
           <div class="band"><div class="band-label">Morning</div><div class="band-empty">—</div></div>
-          <div class="band band-pm"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
+          <div class="band"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
           <span class="add-hint">+ Add</span>
         </div>
       </div>
