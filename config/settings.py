@@ -31,6 +31,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # Must be first: Fly health checks may use Host headers Django would reject.
+    "config.health.HealthCheckMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
