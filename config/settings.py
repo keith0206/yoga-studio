@@ -14,7 +14,10 @@ SECRET_KEY = env(
     default="django-insecure-x3rqiu-h#i@f4wwc$vck8ewg0h5&xot2c8%9yb+3%b-2419--d",
 )
 DEBUG = env("DEBUG")
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1", "soulful.fly.dev"])
+ALLOWED_HOSTS = env.list(
+    "ALLOWED_HOSTS",
+    default=["localhost", "127.0.0.1", "soulful.fly.dev", ".fly.dev"],
+)
 
 INSTALLED_APPS = [
     "django.contrib.admin",
