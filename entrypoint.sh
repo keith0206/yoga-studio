@@ -5,5 +5,10 @@ set -e
 # (Fly release_command machines do not receive volume mounts.)
 python manage.py migrate --noinput
 
-# Dual-stack listen via inheritable FDs (see bind_and_run.py).
-exec python /app/bind_and_run.py
+# Fly Proxy and service checks connect to the configured internal IPv4 port.
+exec gunicorn \
+    --workers 1 \
+    --threads 2 \
+    --timeout 60 \
+    --bind "0.0.0.0:${PORT:-8000}" \
+    config.wsgi:application
