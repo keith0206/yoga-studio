@@ -107,15 +107,43 @@
 
     .week-nav { display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap; }
     .week-nav strong { color: var(--umber); }
-    .cal {
-      display: grid; grid-template-columns: 92px repeat(7, 1fr); gap: 6px; margin-top: 0.4rem;
+    .cal-scroll {
+      overflow: auto;
+      max-width: 100%;
+      margin-top: 0.4rem;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
-    .cal-head, .cal-studio {
+    .cal {
+      display: grid;
+      grid-template-columns: 92px repeat(7, minmax(120px, 1fr));
+      gap: 6px;
+      min-width: 940px;
+    }
+    .cal-head, .cal-studio, .cal-corner {
       font-size: 0.72rem; font-weight: 600; color: var(--muted); padding: 0.45rem; text-align: center;
     }
+    .cal-head {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: var(--stone);
+      box-shadow: 0 1px 0 var(--line);
+    }
+    .cal-corner {
+      position: sticky;
+      top: 0;
+      left: 0;
+      z-index: 4;
+      background: var(--stone);
+    }
     .cal-studio {
+      position: sticky;
+      left: 0;
+      z-index: 2;
       text-align: left; color: var(--umber); background: var(--sand); border-radius: 8px;
       display: flex; align-items: center; padding-left: 0.65rem;
+      box-shadow: 1px 0 0 var(--line);
     }
     .cell {
       position: relative;
@@ -471,8 +499,9 @@
       <p class="muted" style="font-size:0.88rem;margin-bottom:0.85rem;">
         Tip: click an empty cell to add a class — studio &amp; date fill in for you.
       </p>
+      <div class="cal-scroll">
       <div class="cal">
-        <div></div>
+        <div class="cal-corner" aria-hidden="true"></div>
         <div class="cal-head">Mon 20</div><div class="cal-head">Tue 21</div><div class="cal-head">Wed 22</div>
         <div class="cal-head">Thu 23</div><div class="cal-head">Fri 24</div><div class="cal-head">Sat 25</div><div class="cal-head">Sun 26</div>
         <div class="cal-studio">Downtown</div>
@@ -535,6 +564,7 @@
           <div class="band"><div class="band-label">Afternoon</div><div class="band-empty">—</div></div>
           <span class="add-hint">+ Add</span>
         </div>
+      </div>
       </div>
     </div>
   </section>

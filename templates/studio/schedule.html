@@ -17,8 +17,9 @@
   <p class="muted tip">Tip: click an empty cell to add a class — studio &amp; date fill in for you.</p>
   {% endif %}
 
+  <div class="cal-scroll">
   <div class="cal">
-    <div></div>
+    <div class="cal-corner" aria-hidden="true"></div>
     {% for day in days %}
       <div class="cal-head">{{ day|date:"D j" }}</div>
     {% endfor %}
@@ -60,6 +61,7 @@
         </div>
       {% endfor %}
     {% endfor %}
+  </div>
   </div>
 </div>
 
