@@ -1,6 +1,6 @@
 role,username,password,url_or_notes
-owner,owner,your-password,"Local: http://127.0.0.1:8000/login/ | Prod: https://soulful.fly.dev | Django admin: /admin/"
-owner,admin,your-password,Second owner login (seeded by seed_demo_data)
-teacher,jane,your-password,Owner can change teacher passwords on /teachers/
-teacher,mark,your-password,
-teacher,ava,your-password,
+owner,owner,owner123,"Local: http://127.0.0.1:8000/login/ | Prod: https://soulful.fly.dev | Django admin: /admin/"
+owner,admin,admin123,Second owner login (seeded by seed_demo_data)
+teacher,jane,teacher123,Owner can change teacher passwords on /teachers/
+teacher,mark,teacher123,
+teacher,ava,teacher123,

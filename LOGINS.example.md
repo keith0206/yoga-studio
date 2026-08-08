@@ -2,13 +2,15 @@
 # Copy to LOGINS.md and fill in. Do not commit LOGINS.md.
 
 ## Local (http://127.0.0.1:8000/login/)
+Seeded by `python manage.py seed_demo_data` / `python setup_local.py`:
+
 | Role | Username | Password |
 |------|----------|----------|
-| Owner | owner | your-password |
-| Owner | admin | your-password |
-| Teacher | jane | your-password |
-| Teacher | mark | your-password |
-| Teacher | ava | your-password |
+| Owner | owner | owner123 |
+| Owner | admin | admin123 |
+| Teacher | jane | teacher123 |
+| Teacher | mark | teacher123 |
+| Teacher | ava | teacher123 |
 
 ## Production (https://soulful.fly.dev)
 | Role | Username | Password |
